@@ -1,0 +1,84 @@
+import React from "react";
+import "../styles/AuthPage.scss";
+import { FaUser, FaLock, FaEnvelope } from "react-icons/fa";
+
+const AuthPage = () => {
+  return (
+    <div className="auth">
+      <div className="authwrapper">
+        {/* SIGN UP */}
+        <div className="auth-card auth-card--left">
+          <h2 className="auth-cardtitle">Sign Up</h2>
+
+          <form className="auth-form">
+            <div className="auth-input">
+              <span className="auth-inputicon">
+                <FaUser />
+              </span>
+              <input type="text" placeholder="username" />
+            </div>
+
+            <div className="auth-input">
+              <span className="auth-inputicon">
+                <FaEnvelope />
+              </span>
+              <input type="email" placeholder="email address" />
+            </div>
+
+            <div className="auth-input">
+              <span className="auth-inputicon">
+                <FaLock />
+              </span>
+              <input type="password" placeholder="create password" />
+            </div>
+
+            <div className="auth-input">
+              <span className="auth-inputicon">
+                <FaLock />
+              </span>
+              <input type="password" placeholder="confirm password" />
+            </div>
+
+            <button type="submit" className="auth-btn auth-btn--primary">
+              Create Account
+            </button>
+
+            <p className="auth-card__footer">
+              Already a member? <button type="button">Log in</button>
+            </p>
+          </form>
+        </div>
+        {/* SIGN IN */}
+        <div className="auth-card auth-card--right">
+          <h2 className="auth-cardtitle">Sign in</h2>
+
+          <form className="auth-form">
+            <div className="auth-input">
+              <span className="auth-inputicon">
+                <FaUser />
+              </span>
+              <input type="text" placeholder="username" />
+            </div>
+
+            <div className="auth-input">
+              <span className="auth-inputicon">
+                <FaLock />
+              </span>
+              <input type="password" placeholder="password" />
+            </div>
+
+            <button type="submit" className="auth-btn auth-btn--primary">
+              Login
+            </button>
+
+            <p className="auth-cardfooter">
+              Not registered? <button type="button">Create an account</button>
+            </p>
+          </form>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default AuthPage;
