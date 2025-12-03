@@ -1,3 +1,4 @@
+
 import React from "react";
 import { useNavigate } from "react-router-dom"; // <--- NY 1: Importerar routing
 import "../styles/AuthPage.scss";
@@ -24,7 +25,7 @@ const AuthPage = () => {
         {/* SIGN UP (Vänstra kortet) */}
         {/* Notera: Jag har inte lagt logik här än, så denna gör inget just nu */}
         <div className="auth-card auth-card--left">
-          <h2 className="auth-cardtitle">Sign Up</h2>
+          <h2 className="auth-card__title">Sign Up</h2>
 
           <form className="auth-form">
             <div className="auth-input">
@@ -67,7 +68,7 @@ const AuthPage = () => {
 
         {/* SIGN IN (Högra kortet) */}
         <div className="auth-card auth-card--right">
-          <h2 className="auth-cardtitle">Sign in</h2>
+          <h2 className="auth-card__title">Sign in</h2>
 
           {/* <--- NY 4: Här kopplar vi funktionen till formuläret */}
           <form className="auth-form" onSubmit={handleLogin}>
@@ -89,7 +90,7 @@ const AuthPage = () => {
               Login
             </button>
 
-            <p className="auth-cardfooter">
+            <p className="auth-card__footer">
               Not registered? <button type="button">Create an account</button>
             </p>
           </form>
