@@ -1,0 +1,142 @@
+// src/styles/MeetupsPage.scss
+
+$bg: #020617;        // mörk bakgrund (nära din auth-sida)
+$card: #020617;
+$text-main: #e5e7eb;
+$text-muted: #6b7280;
+$accent: #22f7c8;    // neon-knappfärgen
+$accent-soft: rgba(34, 247, 200, 0.25);
+
+.meetups-wrapper {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: radial-gradient(circle at top, #0b1120 0, #020617 55%, #000 100%);
+  color: $text-main;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.meetups-card {
+  width: 900px;
+  max-width: 95vw;
+  background: $card;
+  border-radius: 28px;
+  padding: 2rem 2.5rem;
+  box-shadow:
+    18px 18px 40px #000000,
+    -12px -12px 30px rgba(15, 23, 42, 0.9);
+  border: 1px solid rgba(148, 163, 184, 0.05);
+
+  &__title {
+    margin: 0 0 0.4rem 0;
+    font-size: 1.6rem;
+  }
+
+  &__subtitle {
+    margin: 0 0 1.5rem 0;
+    font-size: 0.95rem;
+    color: $text-muted;
+  }
+}
+
+.meetups-layout {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 1.5rem;
+
+  @media (max-width: 880px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.meetups-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+
+  &__item {
+    width: 100%;
+    text-align: left;
+    padding: 0.9rem 1rem;
+    border-radius: 16px;
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    background: linear-gradient(135deg, #020617, #020617);
+    cursor: pointer;
+    color: $text-main;
+    outline: none;
+    transition:
+      transform 0.1s ease,
+      box-shadow 0.1s ease,
+      border-color 0.1s ease,
+      background 0.1s ease;
+
+    &:hover {
+      transform: translateY(-1px);
+      border-color: $accent-soft;
+      box-shadow: 0 0 18px rgba(34, 197, 235, 0.25);
+    }
+
+    &--active {
+      border-color: $accent;
+      box-shadow: 0 0 20px $accent-soft;
+      background: radial-gradient(circle at top left, rgba(34, 197, 235, 0.1), #020617);
+    }
+
+    h2 {
+      margin: 0;
+      font-size: 1rem;
+    }
+  }
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.75rem;
+    align-items: baseline;
+    margin-bottom: 0.3rem;
+  }
+
+  &__time {
+    font-size: 0.8rem;
+    color: $accent;
+    white-space: nowrap;
+  }
+
+  &__line {
+    margin: 0.1rem 0;
+    font-size: 0.85rem;
+    color: $text-muted;
+  }
+}
+
+.meetup-details {
+  border-radius: 18px;
+  padding: 1rem 1.2rem;
+  background: linear-gradient(145deg, #020617, #020617);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.6);
+
+  h2 {
+    margin-top: 0;
+    margin-bottom: 0.75rem;
+  }
+
+  p {
+    margin: 0.25rem 0;
+    font-size: 0.9rem;
+  }
+
+  &__description-label {
+    margin-top: 0.75rem;
+  }
+
+  &__description {
+    color: $text-main;
+  }
+
+  &__placeholder {
+    color: $text-muted;
+    margin: 0;
+  }
+}
