@@ -1,3 +1,4 @@
+
 import React from "react";
 import "../styles/AuthPage.scss";
 import { FaUser, FaLock, FaEnvelope } from "react-icons/fa";
@@ -5,10 +6,10 @@ import { FaUser, FaLock, FaEnvelope } from "react-icons/fa";
 const AuthPage = () => {
   return (
     <div className="auth">
-      <div className="authwrapper">
+      <div className="auth__wrapper">
         {/* SIGN UP */}
         <div className="auth-card auth-card--left">
-          <h2 className="auth-cardtitle">Sign Up</h2>
+          <h2 className="auth-card__title">Sign Up</h2>
 
           <form className="auth-form">
             <div className="auth-input">
@@ -48,9 +49,10 @@ const AuthPage = () => {
             </p>
           </form>
         </div>
+
         {/* SIGN IN */}
         <div className="auth-card auth-card--right">
-          <h2 className="auth-cardtitle">Sign in</h2>
+          <h2 className="auth-card__title">Sign in</h2>
 
           <form className="auth-form">
             <div className="auth-input">
@@ -71,7 +73,7 @@ const AuthPage = () => {
               Login
             </button>
 
-            <p className="auth-cardfooter">
+            <p className="auth-card__footer">
               Not registered? <button type="button">Create an account</button>
             </p>
           </form>
