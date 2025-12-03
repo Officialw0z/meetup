@@ -1,8 +1,11 @@
 // client/src/components/LandingPage.jsx
 import React from "react";
+import { useNavigate } from "react-router-dom"; // <--- 1. IMPORTERA
 import "../styles/LandingPage.scss";
 
 const LandingPage = () => {
+  const navigate = useNavigate(); // <--- 2. AKTIVERA HOOKEN
+
   return (
     <div className="landing">
       <div className="landing__wrapper">
@@ -20,14 +23,13 @@ const LandingPage = () => {
             samma ställe.
           </p>
 
-          {/* Liten rubrik ovanför knapparna */}
           <p className="landing__actions-label">Vad vill du göra?</p>
 
           <div className="landing__actions">
-            {/* De här knapparna kan kopplas till auth-flödet senare */}
             <button
               type="button"
               className="auth-btn auth-btn--primary landing__button-main"
+              onClick={() => navigate("/register")} // <--- 3. NAVIGERA TILL REGISTERINGSIDAN
             >
               Skapa konto
             </button>
@@ -35,6 +37,7 @@ const LandingPage = () => {
             <button
               type="button"
               className="landing__button-ghost landing__login-button"
+              onClick={() => navigate("/login")} // <--- 3. NAVIGERA TILL LOGINSIDAN
             >
               Logga in
             </button>
@@ -51,7 +54,9 @@ const LandingPage = () => {
           <div className="landing-card">
             <p className="landing-card__label">Nästa meetup</p>
             <h2 className="landing-card__title">React &amp; CI/CD Workshop</h2>
-            <p className="landing-card__meta">🕒 Ons 18:00 • 📍 Folkuniversitetet</p>
+            <p className="landing-card__meta">
+              🕒 Ons 18:00 • 📍 Folkuniversitetet
+            </p>
             <p className="landing-card__host">👤 Värd: Klassen</p>
             <p className="landing-card__desc">
               Vi går igenom hur frontend, backend, Docker och pipelines hänger
