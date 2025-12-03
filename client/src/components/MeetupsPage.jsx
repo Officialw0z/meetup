@@ -1,5 +1,5 @@
 // src/components/MeetupsPage.jsx
-import { useState } from "react";
+import { useState, useEffect } from "react"; // <--- Lade till useEffect
 import "../styles/MeetupsPage.scss";
 
 const MOCK_MEETUPS = [
@@ -46,8 +46,36 @@ function formatDate(dateString) {
 
 export default function MeetupsPage() {
   const [selectedId, setSelectedId] = useState(null);
+  
+  // --- NYTT: States för laddning och data ---
+  const [loading, setLoading] = useState(true);
+  const [meetups, setMeetups] = useState([]);
 
-  const selected = MOCK_MEETUPS.find((m) => m.id === selectedId);
+  // --- NYTT: Simulera hämtning ---
+  useEffect(() => {
+    const fakeFetch = () => {
+      setTimeout(() => {
+        setMeetups(MOCK_MEETUPS); // Flytta mock-data till state
+        setLoading(false);        // Klart!
+      }, 1000); // Vänta 1 sekund
+    };
+
+    fakeFetch();
+  }, []);
+
+  // Hitta vald meetup baserat på state-datan (inte konstanten)
+  const selected = meetups.find((m) => m.id === selectedId);
+
+  // --- NYTT: Visa laddnings-snurra ---
+  if (loading) {
+    return (
+      <div className="meetups-wrapper">
+        <div style={{ display: 'flex', height: '80vh', alignItems: 'center', justifyContent: 'center' }}>
+           <div className="spinner"></div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="meetups-wrapper">
@@ -59,9 +87,9 @@ export default function MeetupsPage() {
         </p>
 
         <div className="meetups-layout">
-          {/* Lista med meetups */}
+          {/* Lista med meetups (Vi mappar nu "meetups" istället för MOCK_MEETUPS) */}
           <div className="meetups-list">
-            {MOCK_MEETUPS.map((meetup) => (
+            {meetups.map((meetup) => (
               <button
                 key={meetup.id}
                 className={`meetups-list__item ${
