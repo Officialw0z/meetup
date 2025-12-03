@@ -20,7 +20,7 @@ const AuthPage = () => {
 
   return (
     <div className="auth">
-      <div className="authwrapper">
+      <div className="auth__wrapper">
         
         {/* SIGN UP (Vänstra kortet) */}
         {/* Notera: Jag har inte lagt logik här än, så denna gör inget just nu */}
