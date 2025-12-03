@@ -1,13 +1,29 @@
 
 import React from "react";
+import { useNavigate } from "react-router-dom"; // <--- NY 1: Importerar routing
 import "../styles/AuthPage.scss";
 import { FaUser, FaLock, FaEnvelope } from "react-icons/fa";
 
 const AuthPage = () => {
+  const navigate = useNavigate(); // <--- NY 2: Startar hooken
+
+  // <--- NY 3: Funktionen som körs när man klickar Login
+  const handleLogin = (e) => {
+    e.preventDefault(); // Stoppar sidan från att ladda om
+  /*   console.log("Loggar in och navigerar till profil..."); */
+  localStorage.setItem("token", "12345-fake-token"); // Tas bort när backend fungerar
+    localStorage.setItem("username", "FrontendKing"); // Tas bort när backend fungerar
+    
+    navigate("/profile");
+    navigate("/profile"); // Skickar användaren till profilsidan
+  };
+
   return (
     <div className="auth">
-      <div className="auth__wrapper">
-        {/* SIGN UP */}
+      <div className="authwrapper">
+        
+        {/* SIGN UP (Vänstra kortet) */}
+        {/* Notera: Jag har inte lagt logik här än, så denna gör inget just nu */}
         <div className="auth-card auth-card--left">
           <h2 className="auth-card__title">Sign Up</h2>
 
@@ -50,11 +66,12 @@ const AuthPage = () => {
           </form>
         </div>
 
-        {/* SIGN IN */}
+        {/* SIGN IN (Högra kortet) */}
         <div className="auth-card auth-card--right">
           <h2 className="auth-card__title">Sign in</h2>
 
-          <form className="auth-form">
+          {/* <--- NY 4: Här kopplar vi funktionen till formuläret */}
+          <form className="auth-form" onSubmit={handleLogin}>
             <div className="auth-input">
               <span className="auth-inputicon">
                 <FaUser />
