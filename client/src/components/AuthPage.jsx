@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom"; // <--- Hämta useLocation
+import React from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import "../styles/AuthPage.scss";
 import { FaUser, FaLock, FaEnvelope } from "react-icons/fa";
 
@@ -7,21 +7,12 @@ const AuthPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // State: "login" eller "register"
-  const [activeTab, setActiveTab] = useState("login");
+  // LÖSNINGEN: Vi "härleder" värdet direkt från URL:en.
+  // Inget useState, inget useEffect behövs!
+  const activeTab = location.pathname === "/register" ? "register" : "login";
 
-  // Kolla URL:en när sidan laddas för att sätta rätt tab
-  useEffect(() => {
-    if (location.pathname === "/register") {
-      setActiveTab("register");
-    } else {
-      setActiveTab("login");
-    }
-  }, [location.pathname]);
-
-  // Funktion för att byta (uppdaterar URL utan att ladda om)
+  // Funktion för att byta tab (nu behöver vi bara navigera)
   const switchTab = (tab) => {
-    setActiveTab(tab);
     navigate(`/${tab}`);
   };
 
@@ -35,14 +26,12 @@ const AuthPage = () => {
   const handleRegister = (e) => {
     e.preventDefault();
     alert("Konto skapat! (Mock)");
-    switchTab("login"); // Byt till login efter registrering
+    switchTab("login");
   };
 
   return (
     <div className="auth">
       <div className="auth__wrapper single-card-mode">
-        {" "}
-        {/* Ny klass för styling */}
         {/* --- REGISTER CARD --- */}
         {activeTab === "register" && (
           <div className="auth-card auth-card--left fade-in">
@@ -80,6 +69,7 @@ const AuthPage = () => {
             </form>
           </div>
         )}
+
         {/* --- LOGIN CARD --- */}
         {activeTab === "login" && (
           <div className="auth-card auth-card--right fade-in">
