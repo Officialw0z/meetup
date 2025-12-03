@@ -1,0 +1,216 @@
+// client/src/styles/LandingPage.scss
+
+// Samma typ av färger som AuthPage
+$bg: #111827;
+$card: #111827;
+$text-main: #e5e7eb;
+$text-muted: #9ca3af;
+$accent: #22f7c8;
+$accent-strong: #14f4ff;
+
+// Skuggor (liknande auth-sidan)
+$shadow-out-top-left: -10px -10px 20px #1f2937;
+$shadow-out-bottom-right: 10px 10px 20px #020617;
+$shadow-in:
+  inset 8px 8px 14px #020617,
+  inset -8px -8px 14px #1f2937;
+
+.landing {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  background: radial-gradient(circle at top, #1f2937 0, $bg 40%, #020617 100%);
+  color: $text-main;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  transform: scale(1.05); // förstorar allt 5%
+  transform-origin: center;
+}
+
+.landing__wrapper {
+  width: 100%;
+  max-width: 1350px;
+  min-height: 650px; // gör rutan högre
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 3.5rem;
+  padding: 3.4rem 4rem;
+  border-radius: 2.4rem;
+  background: $bg;
+  box-shadow: $shadow-out-top-left, $shadow-out-bottom-right;
+  position: relative;
+}
+
+.landing__hero {
+  display: flex;
+  flex-direction: column;
+  gap: 1.3rem;
+}
+
+.landing__badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.25rem 0.9rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: $accent-strong;
+  border: 1px solid rgba(34, 247, 200, 0.4);
+  background: radial-gradient(
+    circle at top left,
+    rgba(34, 197, 235, 0.18),
+    transparent 60%
+  );
+}
+
+.landing__title {
+  font-size: 2rem;
+  line-height: 1.2;
+  margin: 0;
+}
+
+.landing__subtitle {
+  margin: 0 0 1.2rem 0;
+  font-size: 0.95rem;
+  color: $text-muted;
+  max-width: 33rem;
+}
+
+.landing__actions-label {
+  font-size: 0.85rem;
+  color: $text-muted;
+  margin: 0 0 0.4rem 0;
+}
+
+.landing__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.9rem;
+  margin-top: 0.5rem;
+}
+
+.landing__button-main {
+  min-width: 150px;
+}
+
+.landing__login-button {
+  margin-top: 1.2rem; // flyttar "Logga in" lite längre ner
+}
+
+.landing__button-ghost {
+  border-radius: 999px;
+  padding: 0.8rem 1.3rem;
+  border: 1px solid rgba(148, 163, 184, 0.5);
+  background: transparent;
+  color: $text-main;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+
+  &:hover {
+    border-color: $accent;
+    box-shadow: 0 0 18px rgba(34, 197, 235, 0.35);
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: translateY(0);
+    box-shadow: 0 0 10px rgba(34, 197, 235, 0.2);
+  }
+}
+
+.landing__hint {
+  margin-top: 0.8rem;
+  font-size: 0.8rem;
+  color: $text-muted;
+}
+
+.landing__preview {
+  display: grid;
+  grid-template-rows: auto auto auto;
+  gap: 0.9rem;
+}
+
+.landing-card {
+  border-radius: 1.4rem;
+  padding: 1.6rem 1.8rem;
+  background: $card;
+  box-shadow: $shadow-in;
+  border: 1px solid rgba(148, 163, 184, 0.25);
+
+  &__label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: $accent-strong;
+    margin: 0 0 0.4rem 0;
+  }
+
+  &__title {
+    margin: 0 0 0.4rem 0;
+    font-size: 1.1rem;
+  }
+
+  &__title-small {
+    margin: 0 0 0.2rem 0;
+    font-size: 0.95rem;
+  }
+
+  &__meta {
+    margin: 0 0 0.25rem 0;
+    font-size: 0.85rem;
+    color: $text-muted;
+  }
+
+  &__host {
+    margin: 0 0 0.5rem 0;
+    font-size: 0.85rem;
+  }
+
+  &__desc {
+    margin: 0;
+    font-size: 0.9rem;
+    color: $text-main;
+  }
+
+  &--ghost {
+    box-shadow: none;
+    background: radial-gradient(
+      circle at top left,
+      rgba(34, 197, 235, 0.12),
+      #020617 65%
+    );
+  }
+}
+
+// Responsiv
+@media (max-width: 900px) {
+  .landing__wrapper {
+    grid-template-columns: 1fr;
+    padding: 2rem;
+    gap: 2rem;
+  }
+
+  .landing__preview {
+    grid-template-columns: 1fr 1fr;
+    grid-auto-rows: auto;
+  }
+}
+
+@media (max-width: 600px) {
+  .landing {
+    padding: 1.5rem 1rem;
+  }
+
+  .landing__wrapper {
+    padding: 1.6rem;
+  }
+
+  .landing__preview {
+    grid-template-columns: 1fr;
+  }
+}
