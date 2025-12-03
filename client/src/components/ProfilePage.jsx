@@ -1,37 +1,69 @@
-import React from 'react';
-import '../styles/ProfilePage.scss'; // Vi skapar denna strax
+import React, { useState, useEffect } from 'react';
+import '../styles/ProfilePage.scss';
 import { FaCalendarAlt, FaMapMarkerAlt, FaClock, FaHistory, FaSignOutAlt } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 
 const ProfilePage = () => {
   const navigate = useNavigate();
+  
+  // States
+  const [loading, setLoading] = useState(true); // Börjar som "laddar"
+  const [upcomingMeetups, setUpcomingMeetups] = useState([]);
+  const [pastMeetups, setPastMeetups] = useState([]);
+  const [username] = useState(localStorage.getItem("username") || "Användare");
 
-  // MOCK-DATA (Eftersom backend inte är kopplad än)
-  const upcomingMeetups = [
-    { id: 1, title: 'React Advanced Workshop', date: '2023-12-15', time: '18:00', location: 'Stockholm HQ' },
-    { id: 2, title: 'Docker for Beginners', date: '2024-01-10', time: '17:30', location: 'Online' },
-  ];
+ useEffect(() => {
+    
+    const fakeFetch = () => {
+      setTimeout(() => {
+        // Låtsas-data
+        setUpcomingMeetups([
+           { id: 1, title: 'React Workshop', date: '2023-12-15', time: '18:00', location: 'Stockholm HQ' },
+           { id: 2, title: 'Julfest med koden', date: '2023-12-20', time: '17:00', location: 'Kontoret' }
+        ]);
+        
+        setPastMeetups([
+           { id: 3, title: 'Intro till Docker', date: '2023-11-01', time: '18:00', location: 'Online' }
+        ]);
 
-  const pastMeetups = [
-    { id: 3, title: 'Intro till CI/CD', date: '2023-11-01', time: '18:00', location: 'Göteborg' },
-    { id: 4, title: 'AWS Cloud Basics', date: '2023-10-20', time: '19:00', location: 'Online' },
-  ];
+        setLoading(false);
+      }, 1500);
+    };
+
+    fakeFetch();
+  }, []);
 
   const handleLogout = () => {
-    navigate('/'); // Gå tillbaka till inloggning
+    localStorage.removeItem("token");
+    localStorage.removeItem("username");
+    navigate('/');
   };
 
+  // --- RENDERING ---
+
+  // 1. Visa spinner om vi laddar
+  if (loading) {
+    return (
+      <div className="profile">
+        {/* Centrerad spinner */}
+        <div style={{ display: 'flex', height: '100vh', alignItems: 'center', justifyContent: 'center' }}>
+           <div className="spinner"></div> {/* Se till att CSS finns för denna */}
+        </div>
+      </div>
+    );
+  }
+
+  // 2. Visa profilen när datan är "hämtad"
   return (
     <div className="profile">
       <div className="profile__wrapper">
         
-        {/* Header Section */}
         <header className="profile__header">
           <div className="profile__user-info">
-            <div className="profile__avatar">JW</div>
+            <div className="profile__avatar">{username.charAt(0).toUpperCase()}</div>
             <div>
-              <h1>Hej, John Wick!</h1>
-              <p>Fullstack Developer</p>
+              <h1>Hej, {username}!</h1>
+              <p>Meetup Medlem</p>
             </div>
           </div>
           <button onClick={handleLogout} className="profile__logout-btn">
@@ -39,7 +71,7 @@ const ProfilePage = () => {
           </button>
         </header>
 
-        {/* Kommande Meetups */}
+        {/* Kommande */}
         <section className="profile__section">
           <h2><FaCalendarAlt /> Kommande Meetups</h2>
           <div className="meetup-list">
@@ -47,7 +79,7 @@ const ProfilePage = () => {
               <div key={meetup.id} className="meetup-card meetup-card--upcoming">
                 <div className="meetup-card__date">
                   <span>{meetup.date.split('-')[2]}</span>
-                  <small>DEC</small> {/* Hårdkodat för demo */}
+                  <small>DEC</small>
                 </div>
                 <div className="meetup-card__info">
                   <h3>{meetup.title}</h3>
@@ -63,15 +95,16 @@ const ProfilePage = () => {
         <section className="profile__section">
           <h2><FaHistory /> Tidigare Meetups</h2>
           <div className="meetup-list">
-            {pastMeetups.map((meetup) => (
-              <div key={meetup.id} className="meetup-card meetup-card--past">
-                <div className="meetup-card__info">
-                  <h3>{meetup.title}</h3>
-                  <p>{meetup.date} • {meetup.location}</p>
+             {/* ... rendera pastMeetups på samma sätt ... */}
+             {pastMeetups.map((meetup) => (
+                <div key={meetup.id} className="meetup-card meetup-card--past">
+                   <div className="meetup-card__info">
+                      <h3>{meetup.title}</h3>
+                      <p>{meetup.date}</p>
+                   </div>
+                   <span className="meetup-status">Genomförd</span>
                 </div>
-                <span className="meetup-status">Genomförd</span>
-              </div>
-            ))}
+             ))}
           </div>
         </section>
 
