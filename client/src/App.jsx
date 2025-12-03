@@ -3,17 +3,24 @@ import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import AuthPage from "./components/AuthPage.jsx";
 import ProfilePage from "./components/ProfilePage.jsx";
+import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import "./index.css";
 
 function App() {
   return (
     <Router>
       <Routes>
-        {/* Startsidan är inloggning */}
         <Route path="/" element={<AuthPage />} />
         
-        {/* Profilsidan */}
-        <Route path="/profile" element={<ProfilePage />} />
+        {/* Skydda profilsidan */}
+        <Route 
+          path="/profile" 
+          element={
+            <ProtectedRoute>
+              <ProfilePage />
+            </ProtectedRoute>
+          } 
+        />
       </Routes>
     </Router>
   );

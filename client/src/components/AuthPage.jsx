@@ -9,7 +9,11 @@ const AuthPage = () => {
   // <--- NY 3: Funktionen som körs när man klickar Login
   const handleLogin = (e) => {
     e.preventDefault(); // Stoppar sidan från att ladda om
-    console.log("Loggar in och navigerar till profil...");
+  /*   console.log("Loggar in och navigerar till profil..."); */
+  localStorage.setItem("token", "12345-fake-token"); // Tas bort när backend fungerar
+    localStorage.setItem("username", "FrontendKing"); // Tas bort när backend fungerar
+    
+    navigate("/profile");
     navigate("/profile"); // Skickar användaren till profilsidan
   };
 
