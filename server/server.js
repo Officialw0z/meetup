@@ -3,8 +3,7 @@ require('dotenv').config();
 
 const express = require('express');
 const cors = require('cors');
-
-// يستورد db.js عشان يعمل connect + init + seed
+const userRoutes = require('./routes/users');
 require('./db');
 
 const healthRoutes = require('./routes/health');
@@ -17,7 +16,7 @@ const app = express();
 // ============================
 app.use(
     cors({
-    origin: process.env.FRONTEND_ORIGIN || '*', // غيّرها لاحقاً لدومين الفرونت
+    origin: process.env.FRONTEND_ORIGIN || '*',
     })
 );
 app.use(express.json());
@@ -27,13 +26,12 @@ app.use(express.json());
 // ============================
 app.use('/', healthRoutes);
 app.use('/api/meetups', meetupRoutes);
-
-// 404 لو ما لقى أي route
+app.use('/api/users', userRoutes);
 app.use((req, res) => {
     res.status(404).json({ error: 'Not found' });
 });
 
-// Error handler عام
+
 app.use((err, req, res, next) => {
     console.error('Unhandled error:', err);
     if (res.headersSent) return next(err);

@@ -1,22 +1,28 @@
-const express = require('express');
-const router = express.Router();
-const pool = require('../db');
+    // server/routes/health.js
+    const express = require('express');
+    const router = express.Router();
+    const pool = require('../db');
 
-// Health check
-router.get('/health', (req, res) => {
+    // ============================
+    // GET /health
+    // ============================
+    router.get('/health', (req, res) => {
     res.json({ status: 'ok' });
-});
+    });
 
-// Test DB
-router.get('/db-test', async (req, res) => {
+    // ============================
+    // GET /db-test
+    // ============================
+    router.get('/db-test', async (req, res) => {
     try {
-    const result = await pool.query('SELECT NOW()');
-    res.json({ time: result.rows[0].now });
+        const result = await pool.query('SELECT NOW()');
+        res.json({ time: result.rows[0].now });
     } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Database connection failed' });
+        console.error('DB Test Error:', err);
+        res.status(500).json({ error: 'Database connection failed' });
     }
-});
+    });
 
-module.exports = router;
+    module.exports = router;
+
 
