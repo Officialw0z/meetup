@@ -67,7 +67,8 @@ export default function MeetupsPage() {
     return (
       meetup.title.toLowerCase().includes(text) ||
       (meetup.description && meetup.description.toLowerCase().includes(text)) ||
-      meetup.location.toLowerCase().includes(text)
+      meetup.location.toLowerCase().includes(text) ||
+      (meetup.host && meetup.host.toLowerCase().includes(text))
     );
   });
 
