@@ -10,10 +10,19 @@ const pool = require("../db");
 router.get("/", async (req, res) => {
   try {
     const result = await pool.query(`
-        SELECT id, title, description, date, location, host
-        FROM meetups
-        ORDER BY date ASC
-        `);
+        SELECT 
+          m.id, 
+          m.title, 
+          m.description, 
+          m.date, 
+          m.location, 
+          m.host,
+          COUNT(s.id)::int AS attending -- Räkna antalet rader i signups för detta meetup
+        FROM meetups m
+        LEFT JOIN signups s ON m.id = s.meetup_id
+        GROUP BY m.id
+        ORDER BY m.date ASC
+    `);
 
     res.json(result.rows);
   } catch (err) {
@@ -32,13 +41,23 @@ router.get("/search", async (req, res) => {
   try {
     const result = await pool.query(
       `
-        SELECT id, title, description, date, location, host
-        FROM meetups
-        WHERE title ILIKE $1
-            OR description ILIKE $1
-            OR location ILIKE $1
-        ORDER BY date ASC
-        `,
+        SELECT 
+          m.id, 
+          m.title, 
+          m.description, 
+          m.date, 
+          m.location, 
+          m.host,
+          COUNT(s.id)::int AS attending
+        FROM meetups m
+        LEFT JOIN signups s ON m.id = s.meetup_id
+        WHERE m.title ILIKE $1
+           OR m.description ILIKE $1
+           OR m.location ILIKE $1
+           OR m.host ILIKE $1
+        GROUP BY m.id
+        ORDER BY m.date ASC
+      `,
       [`%${q}%`]
     );
 
@@ -59,10 +78,19 @@ router.get("/:id", async (req, res) => {
   try {
     const result = await pool.query(
       `
-        SELECT id, title, description, date, location, host
-        FROM meetups
-        WHERE id = $1
-        `,
+        SELECT 
+          m.id, 
+          m.title, 
+          m.description, 
+          m.date, 
+          m.location, 
+          m.host,
+          COUNT(s.id)::int AS attending
+        FROM meetups m
+        LEFT JOIN signups s ON m.id = s.meetup_id
+        WHERE m.id = $1
+        GROUP BY m.id
+      `,
       [id]
     );
 
@@ -98,20 +126,24 @@ router.post("/:id/signup", async (req, res) => {
     if (exists.rows.length === 0) {
       return res.status(404).json({ error: "Meetup not found" });
     }
-
-    // Insert signup
     const result = await pool.query(
       `
         INSERT INTO signups (meetup_id, name, email)
         VALUES ($1, $2, $3)
         RETURNING id, meetup_id, name, email, created_at
-        `,
+      `,
       [meetupId, name, email]
     );
 
     res.json({ success: true, signup: result.rows[0] });
   } catch (err) {
     console.error("Signup error:", err);
+    // Hantera unik constraint (om man redan är anmäld)
+    if (err.code === "23505") {
+      return res
+        .status(409)
+        .json({ error: "Du är redan anmäld till denna meetup" });
+    }
     res.status(500).json({ error: "Signup failed" });
   }
 });
@@ -134,7 +166,7 @@ router.delete("/:id/signup", async (req, res) => {
         DELETE FROM signups
         WHERE meetup_id = $1 AND email = $2
         RETURNING id
-        `,
+      `,
       [meetupId, email]
     );
 
