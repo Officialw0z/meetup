@@ -1,0 +1,190 @@
+// Färger
+$bg: #111827;
+$card: #111827;
+$outline: #14f4ff;
+$text-main: #e5e7eb;
+$text-muted: #9ca3af;
+$button: #00f8c6;
+
+// Skuggor för "neumorphism"
+$shadow-out-top-left: -10px -10px 20px #1f2937;
+$shadow-out-bottom-right: 10px 10px 20px #020617;
+$shadow-in:
+  inset 8px 8px 14px #020617,
+  inset -8px -8px 14px #1f2937;
+
+.auth {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  background: radial-gradient(circle at top, #1f2937 0, $bg 40%, #020617 100%);
+}
+
+.auth__wrapper {
+  width: 100%;
+  max-width: 1100px;
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 4rem;
+  padding: 3rem 3.5rem;
+  border-radius: 2rem;
+  background: $bg;
+  box-shadow: $shadow-out-top-left, $shadow-out-bottom-right;
+  position: relative;
+}
+
+// korten
+.auth-card {
+  background: $card;
+  border-radius: 1.6rem;
+  padding: 2.4rem 2.6rem;
+  box-shadow: $shadow-in;
+  position: relative;
+  color: $text-main;
+
+  &--left {
+    /* större kort, inget extra just nu */
+  }
+
+  &--right {
+    /* kan göras lite mindre visuellt */
+  }
+
+  &__title {
+    text-align: left;
+    margin: 0 0 1.5rem 0;
+    font-weight: 600;
+    font-size: 1.6rem;
+    letter-spacing: 0.04em;
+  }
+
+  &__footer {
+    margin-top: 1.6rem;
+    font-size: 0.85rem;
+    color: $text-muted;
+
+    button {
+      background: none;
+      border: none;
+      padding: 0;
+      margin-left: 0.15rem;
+      color: #ffffff;
+      font-size: 0.85rem;
+      cursor: pointer;
+      text-decoration: underline;
+    }
+  }
+}
+
+// formulär
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}
+
+// inputs med ikon
+.auth-input {
+  display: flex;
+  align-items: center;
+  background: $card;
+  border-radius: 999px;
+  padding: 0.4rem 1.1rem;
+  box-shadow: $shadow-in;
+  position: relative;
+
+  &icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 0.7rem;
+    color: $outline;
+    font-size: 0.9rem;
+  }
+
+  input {
+    flex: 1;
+    border: none;
+    outline: none;
+    background: transparent;
+    color: $text-main;
+    font-size: 0.95rem;
+    padding: 0.5rem 0;
+
+    &::placeholder {
+      color: $text-muted;
+      text-transform: lowercase;
+    }
+  }
+}
+
+// knappar
+.auth-btn {
+  border-radius: 999px;
+  border: none;
+  padding: 0.9rem 1.2rem;
+  margin-top: 0.4rem;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+
+  &--primary {
+    width: 100%;
+    background: linear-gradient(90deg, $outline, $button);
+    color: #012b35;
+    box-shadow: 0 12px 30px rgba(0, 248, 198, 0.55);
+
+    &:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 18px 40px rgba(0, 248, 198, 0.7);
+    }
+
+    &:active {
+      transform: translateY(0);
+      box-shadow: 0 8px 18px rgba(0, 248, 198, 0.4);
+    }
+  }
+}
+
+// responsiv
+@media (max-width: 900px) {
+  .authwrapper {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    padding: 2rem;
+  }
+
+  .auth-card {
+    padding: 1.8rem 1.9rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .auth {
+    padding: 1.5rem 1rem;
+  }
+
+  .auth__wrapper {
+    padding: 1.5rem;
+  }
+}
+
+
+.single-card-mode {
+  display: flex !important;
+  justify-content: center;
+  max-width: 500px !important; 
+}
+
+
+.fade-in {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
