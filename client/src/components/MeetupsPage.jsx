@@ -224,7 +224,6 @@ export default function MeetupsPage() {
                   <p>
                     <strong>Plats:</strong> {selected.location}
                   </p>
-                  {/* Backend skickar inte host än, så vi döljer det om det saknas */}
                   {selected.host && (
                     <p>
                       <strong>Värd:</strong> {selected.host}
