@@ -5,7 +5,6 @@ const pool = require("../db");
 
 // ============================
 // GET /api/meetups
-// User Story #17: Lista över kommande meetups
 // ============================
 router.get("/", async (req, res) => {
   try {
@@ -17,10 +16,10 @@ router.get("/", async (req, res) => {
           m.date, 
           m.location, 
           m.host,
-          COUNT(s.id)::int AS attending -- Räkna antalet rader i signups för detta meetup
+          COUNT(s.id)::int AS attending
         FROM meetups m
         LEFT JOIN signups s ON m.id = s.meetup_id
-        GROUP BY m.id
+        GROUP BY m.id, m.title, m.description, m.date, m.location, m.host -- <--- VIKTIG ÄNDRING HÄR
         ORDER BY m.date ASC
     `);
 
@@ -32,8 +31,7 @@ router.get("/", async (req, res) => {
 });
 
 // ============================
-// GET /api/meetups/search?q=...
-// User Story #18: Söka efter meetups
+// GET /api/meetups/search
 // ============================
 router.get("/search", async (req, res) => {
   const q = req.query.q || "";
@@ -55,7 +53,7 @@ router.get("/search", async (req, res) => {
            OR m.description ILIKE $1
            OR m.location ILIKE $1
            OR m.host ILIKE $1
-        GROUP BY m.id
+        GROUP BY m.id, m.title, m.description, m.date, m.location, m.host -- <--- VIKTIG ÄNDRING HÄR OCKSÅ
         ORDER BY m.date ASC
       `,
       [`%${q}%`]
@@ -70,7 +68,6 @@ router.get("/search", async (req, res) => {
 
 // ============================
 // GET /api/meetups/:id
-// User Story #22: Mer info om meetup
 // ============================
 router.get("/:id", async (req, res) => {
   const { id } = req.params;
@@ -89,7 +86,7 @@ router.get("/:id", async (req, res) => {
         FROM meetups m
         LEFT JOIN signups s ON m.id = s.meetup_id
         WHERE m.id = $1
-        GROUP BY m.id
+        GROUP BY m.id, m.title, m.description, m.date, m.location, m.host -- <--- OCH HÄR
       `,
       [id]
     );
@@ -105,9 +102,9 @@ router.get("/:id", async (req, res) => {
   }
 });
 
+// ... (Resten av filen med POST och DELETE är oförändrad, kopiera in den också)
 // ============================
 // POST /api/meetups/:id/signup
-// User Story #19: Anmäla mig
 // ============================
 router.post("/:id/signup", async (req, res) => {
   const meetupId = req.params.id;
@@ -118,7 +115,6 @@ router.post("/:id/signup", async (req, res) => {
   }
 
   try {
-    // Check meetup exists
     const exists = await pool.query("SELECT id FROM meetups WHERE id = $1", [
       meetupId,
     ]);
@@ -126,6 +122,7 @@ router.post("/:id/signup", async (req, res) => {
     if (exists.rows.length === 0) {
       return res.status(404).json({ error: "Meetup not found" });
     }
+
     const result = await pool.query(
       `
         INSERT INTO signups (meetup_id, name, email)
@@ -138,7 +135,6 @@ router.post("/:id/signup", async (req, res) => {
     res.json({ success: true, signup: result.rows[0] });
   } catch (err) {
     console.error("Signup error:", err);
-    // Hantera unik constraint (om man redan är anmäld)
     if (err.code === "23505") {
       return res
         .status(409)
@@ -150,11 +146,10 @@ router.post("/:id/signup", async (req, res) => {
 
 // ============================
 // DELETE /api/meetups/:id/signup
-// User Story #24: Avregistrera mig
 // ============================
 router.delete("/:id/signup", async (req, res) => {
   const meetupId = req.params.id;
-  const { email } = req.body; // or use req.query.email
+  const { email } = req.body;
 
   if (!email) {
     return res.status(400).json({ error: "email krävs för att avregistrera" });
