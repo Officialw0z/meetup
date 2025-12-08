@@ -1,40 +1,11 @@
 import { useState, useEffect } from "react";
-import { FaSearch, FaCheckCircle, FaExclamationCircle, FaTimesCircle } from "react-icons/fa";
+import {
+  FaSearch,
+  FaCheckCircle,
+  FaExclamationCircle,
+  FaTimesCircle,
+} from "react-icons/fa";
 import "../styles/MeetupsPage.scss";
-
-// MOCK DATA
-const MOCK_MEETUPS = [
-  {
-    id: 1,
-    title: "React Meetup",
-    time: "2025-12-10T18:00:00",
-    location: "Stockholm, Folkuniversitetet",
-    host: "Magdalena",
-    description: "Vi går igenom grunderna i React, komponenter och hur vi byggt den här appen.",
-    capacity: 20,
-    attending: 15,
-  },
-  {
-    id: 2,
-    title: "JavaScript-kväll",
-    time: "2025-12-15T17:30:00",
-    location: "Online (Zoom)",
-    host: "Klassgruppen",
-    description: "Frågestund om JavaScript, CI/CD, Git flow och grupparbetet.",
-    capacity: 10,
-    attending: 10, // Fullbokad
-  },
-  {
-    id: 3,
-    title: "CI/CD & DevOps intro",
-    time: "2026-01-05T17:00:00",
-    location: "Campus / Hybrid",
-    host: "Läraren",
-    description: "Vi tittar på pipelines, GitHub Actions och hur deployen till AWS & Render fungerar.",
-    capacity: 50,
-    attending: 2,
-  },
-];
 
 function formatDate(dateString) {
   const d = new Date(dateString);
@@ -49,76 +20,133 @@ function formatDate(dateString) {
 }
 
 export default function MeetupsPage() {
+  // --- STATES ---
   const [selectedId, setSelectedId] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [meetups, setMeetups] = useState([]);
+  const [meetups, setMeetups] = useState([]); // Alla meetups från DB
+  const [mySignups, setMySignups] = useState([]); // IDn på meetups jag bokat
   const [searchTerm, setSearchTerm] = useState("");
-  
-  // --- NYTT: Håller koll på vilka meetups JAG är anmäld till ---
-  const [mySignups, setMySignups] = useState([]);
 
+  // --- CONFIG ---
+  const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+  const userEmail = localStorage.getItem("email");
+  const userName = localStorage.getItem("username");
+
+  // --- HÄMTA DATA VID START ---
   useEffect(() => {
-    const fakeFetch = () => {
-      setTimeout(() => {
-        setMeetups(MOCK_MEETUPS);
-        setLoading(false);
-      }, 1000);
-    };
-    fakeFetch();
-  }, []);
+    const fetchData = async () => {
+      try {
+        // 1. Hämta alla meetups från backend
+        const meetupsRes = await fetch(`${API_URL}/api/meetups`);
+        const meetupsData = await meetupsRes.json();
+        setMeetups(meetupsData);
 
+        // 2. Om inloggad: Hämta mina anmälningar för att se vad jag bokat
+        if (userEmail) {
+          const myRes = await fetch(
+            `${API_URL}/api/users/${userEmail}/meetups`
+          );
+          const myData = await myRes.json();
+          // Vi sparar bara ID:na i en lista för enkel kontroll senare
+          const myIds = myData.map((m) => m.id);
+          setMySignups(myIds);
+        }
+      } catch (err) {
+        console.error("Kunde inte hämta data:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [API_URL, userEmail]);
+
+  // --- SÖKFUNKTION ---
   const filteredMeetups = meetups.filter((meetup) => {
     const text = searchTerm.toLowerCase();
     return (
       meetup.title.toLowerCase().includes(text) ||
-      meetup.description.toLowerCase().includes(text) ||
-      meetup.location.toLowerCase().includes(text) ||
-      meetup.host.toLowerCase().includes(text)
+      (meetup.description && meetup.description.toLowerCase().includes(text)) ||
+      meetup.location.toLowerCase().includes(text)
     );
   });
 
+  // Hitta vald meetup
   const selected = meetups.find((m) => m.id === selectedId);
-  
-  // --- NYTT: Kolla om jag redan är anmäld till den valda ---
+  // Kolla om jag är anmäld till den valda
   const isRegistered = selected ? mySignups.includes(selected.id) : false;
+  // Kolla om den är full (om backend skickar capacity/attending, annars antar vi false)
+  // OBS: Din kollegas SQL-kod hade inte capacity-kolumn än, så vi sätter en fallback
+  const isFull =
+    selected && selected.capacity && selected.attending >= selected.capacity;
 
-  // --- ANMÄL DIG ---
-  const handleSignup = (id) => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      alert("Du måste vara inloggad för att anmäla dig!");
+  // --- ANMÄLAN (POST) ---
+  const handleSignup = async (id) => {
+    if (!userEmail) {
+      alert("Du måste logga in först!");
       return;
     }
 
-    // 1. Öka antal attending
-    setMeetups((prev) => 
-      prev.map((m) => m.id === id ? { ...m, attending: m.attending + 1 } : m)
-    );
+    try {
+      const res = await fetch(`${API_URL}/api/meetups/${id}/signup`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: userName, email: userEmail }),
+      });
 
-    // 2. Lägg till i "mina anmälningar"
-    setMySignups((prev) => [...prev, id]);
+      if (res.ok) {
+        alert("Du är nu anmäld!");
+        // Uppdatera lokalt så knappen blir grön direkt
+        setMySignups((prev) => [...prev, id]);
 
-    alert("Du är nu anmäld! (Mock)");
+        // (Valfritt) Hämta om listan för att uppdatera antal deltagare
+        // fetchData();
+      } else {
+        const data = await res.json();
+        alert("Fel: " + data.error);
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Kunde inte nå servern.");
+    }
   };
 
-  // --- AVREGISTRERA DIG (NY FUNKTION) ---
-  const handleUnregister = (id) => {
-    // 1. Minska antal attending
-    setMeetups((prev) => 
-      prev.map((m) => m.id === id ? { ...m, attending: m.attending - 1 } : m)
-    );
+  // --- AVREGISTRERING (DELETE) ---
+  const handleUnregister = async (id) => {
+    try {
+      const res = await fetch(`${API_URL}/api/meetups/${id}/signup`, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: userEmail }),
+      });
 
-    // 2. Ta bort från "mina anmälningar"
-    setMySignups((prev) => prev.filter((signupId) => signupId !== id));
-
-    alert("Du har avregistrerat dig.");
+      if (res.ok) {
+        alert("Du har avregistrerats.");
+        // Ta bort ID från min lista lokalt
+        setMySignups((prev) => prev.filter((sid) => sid !== id));
+      } else {
+        const data = await res.json();
+        alert("Fel: " + data.error);
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Kunde inte avregistrera.");
+    }
   };
 
+  // --- RENDERING ---
   if (loading) {
     return (
       <div className="meetups-wrapper">
-        <div style={{ display: 'flex', height: '80vh', alignItems: 'center', justifyContent: 'center' }}>
-           <div className="spinner"></div>
+        <div
+          style={{
+            display: "flex",
+            height: "80vh",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <div className="spinner"></div>
         </div>
       </div>
     );
@@ -128,26 +156,30 @@ export default function MeetupsPage() {
     <div className="meetups-wrapper">
       <div className="meetups-card">
         <h1 className="meetups-card__title">Kommande meetups</h1>
-        
+
+        {/* Sökruta */}
         <div className="search-bar">
           <FaSearch className="search-icon" />
-          <input 
-            type="text" 
-            placeholder="Sök efter ämne eller plats..." 
+          <input
+            type="text"
+            placeholder="Sök efter ämne eller plats..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
 
         <div className="meetups-layout">
+          {/* Lista */}
           <div className="meetups-list">
             {filteredMeetups.length === 0 && (
-              <p style={{ padding: "1rem", color: "#9ca3af" }}>Inga meetups hittades.</p>
+              <p style={{ padding: "1rem", color: "#9ca3af" }}>
+                Inga meetups hittades.
+              </p>
             )}
 
             {filteredMeetups.map((meetup) => {
-              const amISignedUp = mySignups.includes(meetup.id); // Kolla om jag är anmäld
-              
+              const amISignedUp = mySignups.includes(meetup.id);
+
               return (
                 <button
                   key={meetup.id}
@@ -155,28 +187,24 @@ export default function MeetupsPage() {
                     selectedId === meetup.id ? "meetups-list__item--active" : ""
                   }`}
                   onClick={() =>
-                    setSelectedId((prev) => (prev === meetup.id ? null : meetup.id))
+                    setSelectedId((prev) =>
+                      prev === meetup.id ? null : meetup.id
+                    )
                   }
                 >
                   <div className="meetups-list__header">
                     <h2>{meetup.title}</h2>
                     <span className="meetups-list__time">
-                      {formatDate(meetup.time)}
+                      {formatDate(meetup.date)}
                     </span>
                   </div>
                   <p className="meetups-list__line">📍 {meetup.location}</p>
-                  
-                  <div className="status-container">
-                    {/* Visa om jag är anmäld redan i listan */}
-                    {amISignedUp && (
-                       <span className="status-badge status-badge--registered">
-                         <FaCheckCircle /> Anmäld
-                       </span>
-                    )}
 
-                    {/* Visa om det är fullt */}
-                    {!amISignedUp && meetup.attending >= meetup.capacity && (
-                        <span className="status-badge status-badge--full">Fullbokad</span>
+                  <div className="status-container">
+                    {amISignedUp && (
+                      <span className="status-badge status-badge--registered">
+                        <FaCheckCircle /> Anmäld
+                      </span>
                     )}
                   </div>
                 </button>
@@ -184,17 +212,24 @@ export default function MeetupsPage() {
             })}
           </div>
 
+          {/* Detaljer */}
           <div className="meetup-details">
             {selected ? (
               <>
                 <h2>{selected.title}</h2>
                 <div className="meetup-meta-grid">
-                  <p><strong>Tid:</strong> {formatDate(selected.time)}</p>
-                  <p><strong>Plats:</strong> {selected.location}</p>
-                  <p><strong>Värd:</strong> {selected.host}</p>
                   <p>
-                    <strong>Platser:</strong> {selected.attending} / {selected.capacity}
+                    <strong>Datum:</strong> {formatDate(selected.date)}
                   </p>
+                  <p>
+                    <strong>Plats:</strong> {selected.location}
+                  </p>
+                  {/* Backend skickar inte host än, så vi döljer det om det saknas */}
+                  {selected.host && (
+                    <p>
+                      <strong>Värd:</strong> {selected.host}
+                    </p>
+                  )}
                 </div>
 
                 <p className="meetup-details__description-label">
@@ -205,43 +240,37 @@ export default function MeetupsPage() {
                 </p>
 
                 <div className="meetup-actions">
-                  
-                  {/* LOGIK FÖR KNAPPARNA */}
-                  
                   {isRegistered ? (
-                    // 1. Om jag är anmäld -> Visa avregistrera
                     <div className="registered-actions">
-                      <p className="success-msg"><FaCheckCircle /> Du är anmäld till detta event.</p>
-                      <button 
+                      <p className="success-msg">
+                        <FaCheckCircle /> Du är anmäld.
+                      </p>
+                      <button
                         className="action-btn action-btn--danger"
                         onClick={() => handleUnregister(selected.id)}
                       >
-                        <FaTimesCircle style={{marginRight: '8px'}}/> Avregistrera mig
+                        <FaTimesCircle style={{ marginRight: "8px" }} />{" "}
+                        Avregistrera mig
                       </button>
                     </div>
-
-                  ) : selected.attending >= selected.capacity ? (
-                    // 2. Om det är fullt -> Visa varning
+                  ) : isFull ? (
                     <div className="full-warning">
                       <FaExclamationCircle />
-                      <span>Tyvärr, denna meetup är fullbokad.</span>
+                      <span>Fullbokad.</span>
                     </div>
-
                   ) : (
-                    // 3. Annars -> Visa anmäl-knapp
-                    <button 
+                    <button
                       className="action-btn"
                       onClick={() => handleSignup(selected.id)}
                     >
                       Anmäl dig nu
                     </button>
                   )}
-
                 </div>
               </>
             ) : (
               <p className="meetup-details__placeholder">
-                Välj en meetup i listan för att se detaljer och anmäla dig.
+                Välj en meetup i listan för att se detaljer.
               </p>
             )}
           </div>
