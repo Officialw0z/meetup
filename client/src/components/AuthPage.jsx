@@ -126,7 +126,6 @@ const AuthPage = () => {
             <form className="auth-form" onSubmit={handleLogin}>
               <div className="auth-input">
                 <span className="auth-inputicon"><FaEnvelope /></span>
-                {/* VIKTIGT: Backend vill ha email, inte username här */}
                 <input name="email" type="email" placeholder="Email address" required />
               </div>
               <div className="auth-input">

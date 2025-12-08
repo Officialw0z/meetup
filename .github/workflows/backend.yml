@@ -2,7 +2,7 @@ name: Deploy Backend
 
 on:
   push:
-    branches: ["dev"] #ändra till main senare
+    branches: ["main"] #ändra till main senare
     paths:
       - "server/**"
       - ".github/workflows/backend.yml"
