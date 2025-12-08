@@ -2,7 +2,7 @@ name: Deploy Frontend
 
 on:
   push:
-    branches: ["main"] #ändra till main senare
+    branches: ["main"]
     paths:
       - "client/**"
       - ".github/workflows/frontend.yml"
@@ -26,6 +26,8 @@ jobs:
 
       - name: Build React App
         working-directory: ./client
+        env:
+          VITE_API_URL: ${{ vars.VITE_API_URL }}
         run: npm run build
 
       - name: Configure AWS Credentials
